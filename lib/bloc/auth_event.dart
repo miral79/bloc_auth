@@ -12,12 +12,14 @@ class SignUpRequested extends AuthEvent {
   final String password;
   final String name;
   final String phone;
+  final String image;
 
   SignUpRequested(
       {required this.email,
       required this.password,
       required this.name,
-      required this.phone});
+      required this.phone,
+      required this.image});
 }
 
 class SignInRequested extends AuthEvent {

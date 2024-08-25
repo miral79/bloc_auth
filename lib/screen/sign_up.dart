@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:bloc_api_firebase_auth/bloc/auth_bloc.dart';
-import 'package:bloc_api_firebase_auth/screen/home_screen.dart';
 import 'package:bloc_api_firebase_auth/screen/sign_in.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:img_picker/img_picker.dart';
@@ -36,7 +36,7 @@ class _Sign_upState extends State<Sign_up> {
         listener: (context, state) {
           if (state is AuthAuthenticated) {
             Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) => Home_screen(),
+              builder: (context) => Sign_In(),
             ));
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -240,14 +240,14 @@ class _Sign_upState extends State<Sign_up> {
     );
   }
 
-  Signup() async {
+  Future<void> Signup() async {
     String user_name = sginup_name.text;
     String user_email = sginup_email.text;
     String user_password = sginup_password.text;
     String user_phone = sginup_phonenumber.text;
+    String? imagePath = _imageFile?.path;
 
     RegExp emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,}$');
-    RegExp phoneRegex = RegExp(r'^[0-9]{10}$');
 
     if (user_name.isEmpty || user_name.length > 10) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -275,18 +275,35 @@ class _Sign_upState extends State<Sign_up> {
       ));
     } else {
       try {
+        // Upload the image to Firebase Storage if an image is selected
+        String? imageUrl;
+        if (imagePath != null) {
+          final storageRef = FirebaseStorage.instance
+              .ref()
+              .child('user_images/${DateTime.now().toIso8601String()}');
+
+          final file = File(imagePath);
+          final uploadTask = storageRef.putFile(file);
+
+          // Show upload progress
+          uploadTask.snapshotEvents.listen((event) {
+            double progress = event.bytesTransferred / event.totalBytes;
+            print('Upload progress: ${progress * 100}%');
+          });
+
+          // Wait for the upload to complete
+          final snapshot = await uploadTask.whenComplete(() {});
+          imageUrl = await snapshot.ref.getDownloadURL();
+          print('Image URL: $imageUrl');
+        }
+
         BlocProvider.of<AuthBloc>(context).add(SignUpRequested(
           email: user_email,
           password: user_password,
           name: user_name,
           phone: user_phone,
+          image: imageUrl!,
         ));
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Sign_In(),
-          ),
-        );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Colors.red,

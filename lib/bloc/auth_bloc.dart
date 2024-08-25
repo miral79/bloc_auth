@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bloc/bloc.dart';
 import 'package:bloc_api_firebase_auth/repo/repository.dart';
 import 'package:bloc_api_firebase_auth/repo/user_repository.dart';
@@ -38,6 +40,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           name: event.name,
           email: event.email,
           password: event.password,
+          phone: event.phone,
+          image: event.image,
         );
         emit(AuthAuthenticated(uid: user.uid));
         print("MB");
@@ -80,11 +84,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       if (user != null) {
         await userRepository.saveUserData(
-          uid: user.uid,
-          name: user.displayName ?? '',
-          email: user.email ?? '',
-          password: '',
-        );
+            uid: user.uid,
+            name: user.displayName ?? '',
+            email: user.email ?? '',
+            password: '',
+            phone: '',
+            image: '');
         emit(AuthAuthenticated(uid: user.uid));
       } else {
         emit(AuthError(error: 'Google sign in failed.'));
@@ -103,11 +108,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await FirebaseAuth.instance.verifyPhoneNumber(
         phoneNumber: event.phoneNumber,
         verificationCompleted: (PhoneAuthCredential credential) async {
-          await FirebaseAuth.instance.signInWithCredential(credential);
-          emit(AuthAuthenticated(uid: FirebaseAuth.instance.currentUser!.uid));
+          try {
+            final userCredential =
+                await FirebaseAuth.instance.signInWithCredential(credential);
+            emit(AuthAuthenticated(uid: userCredential.user!.uid));
+          } catch (e) {
+            emit(AuthError(error: 'Failed to sign in with phone credentials.'));
+          }
         },
         verificationFailed: (FirebaseAuthException e) {
-          emit(AuthError(error: e.message ?? 'Verification failed.'));
+          emit(AuthError(error: e.message ?? 'Phone verification failed.'));
         },
         codeSent: (String verificationId, int? resendToken) {
           emit(AuthVerified(verificationId));
@@ -117,7 +127,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         },
       );
     } catch (e) {
-      emit(AuthError(error: e.toString()));
+      emit(AuthError(error: 'Phone verification process failed.'));
     }
   }
 

@@ -14,15 +14,19 @@ class UserRepository {
     required String name,
     required String email,
     required String password,
-    // required String picurl,
+    required String phone,
+    required String image,
   }) async {
     try {
-      await _firestore.collection('users').add({
+      // Save to Firestore
+      await _firestore.collection('users').doc(uid).set({
         'name': name,
         'email': email,
         'password': password,
-      }).then((docRef) {
-        print('User data added with ID: ${docRef.id}');
+        'phone': phone,
+        'image': image,
+      }).then((_) {
+        print('User data added with ID: $uid');
       }).catchError((error) {
         print('Failed to add user data: $error');
       });
@@ -31,7 +35,8 @@ class UserRepository {
         'name': name,
         'email': email,
         'password': password,
-        // 'picurl': picurl,
+        'phone': phone,
+        'image': image,
       }).then((_) {
         print('User data saved successfully. == MB');
       }).catchError((error) {
@@ -39,6 +44,17 @@ class UserRepository {
       });
     } catch (e) {
       throw e;
+    }
+  }
+
+  Future<Map<String, dynamic>?> getUserData(String uid) async {
+    try {
+      DocumentSnapshot doc =
+          await _firestore.collection('users').doc(uid).get();
+      return doc.data() as Map<String, dynamic>?;
+    } catch (e) {
+      print('Error fetching user data: $e');
+      return null;
     }
   }
 }

@@ -88,6 +88,7 @@ class AuthRepository {
         verdicationFailed(e);
       },
       codeSent: (String verificationId, int? resendToken) {
+        print("code sent == MB");
         codesent(verificationId, resendToken);
       },
       codeAutoRetrievalTimeout: (String verificationId) {
