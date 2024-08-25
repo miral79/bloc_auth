@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "724861632408",
+    "project_id": "bloc-7d59e",
+    "storage_bucket": "bloc-7d59e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:724861632408:android:58209d6f488cdc347db5ed",
+        "android_client_info": {
+          "package_name": "com.example.bloc_api_firebase_auth"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC0kFbay3UoWcSuT_9Ay8b7e7PjvGKIDe4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
