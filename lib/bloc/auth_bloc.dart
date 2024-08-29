@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:bloc/bloc.dart';
 import 'package:bloc_api_firebase_auth/repo/repository.dart';
 import 'package:bloc_api_firebase_auth/repo/user_repository.dart';
@@ -111,7 +109,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           try {
             final userCredential =
                 await FirebaseAuth.instance.signInWithCredential(credential);
-            emit(AuthAuthenticated(uid: userCredential.user!.uid));
+            if (userCredential.user != null) {
+              emit(AuthAuthenticated(uid: userCredential.user!.uid));
+            } else {
+              emit(AuthError(
+                  error: 'Failed to sign in with phone credentials.'));
+            }
           } catch (e) {
             emit(AuthError(error: 'Failed to sign in with phone credentials.'));
           }
@@ -142,7 +145,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         smsCode: event.smsCode,
       );
 
-      UserCredential userCredential =
+      final userCredential =
           await FirebaseAuth.instance.signInWithCredential(credential);
 
       if (userCredential.user != null) {

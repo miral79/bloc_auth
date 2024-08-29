@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:bloc_api_firebase_auth/bloc/auth_bloc.dart';
 import 'package:bloc_api_firebase_auth/screen/verification_code.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +9,8 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 class PhoneNumberScreen extends StatelessWidget {
   final TextEditingController _phoneController = TextEditingController();
   String? _completePhoneNumber;
+
+  PhoneNumberScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +61,11 @@ class PhoneNumberScreen extends StatelessWidget {
                     context.read<AuthBloc>().add(
                           VerifyPhoneNumberRequested(_completePhoneNumber!),
                         );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text('Please enter a valid phone number.')),
+                    );
                   }
                 },
                 child: Text('Send Verification Code'),

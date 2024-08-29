@@ -51,6 +51,11 @@ class VerificationCodeScreen extends StatelessWidget {
                           SignInWithPhoneNumberRequested(
                               verificationId, smsCode),
                         );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text('Please enter the verification code.')),
+                    );
                   }
                 },
                 child: Text('Verify & Sign In'),

@@ -95,6 +95,7 @@ class AuthRepository {
         codeAutoRetrievalTimout(verificationId);
       },
     );
+    return null;
   }
 
   Future<void> signOut() async {
